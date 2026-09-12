@@ -53,8 +53,10 @@ class MoonlitSearchTest < Minitest::Test
     assert_match(/\A\d+\.\d+\.\d+\z/, package.fetch("devDependencies").fetch("pagefind"))
     assert_includes package.fetch("scripts").fetch("search:index"), "pagefind --site _site"
     assert_includes workflow, "actions/jekyll-build-pages@v1"
+    assert_includes workflow, 'sudo chown -R "$USER":"$USER" _site'
     assert_includes workflow, "npm run search:index"
     assert_operator workflow.index("actions/jekyll-build-pages@v1"), :<, workflow.index("npm run search:index")
+    assert_operator workflow.index('sudo chown -R "$USER":"$USER" _site'), :<, workflow.index("npm run search:index")
     assert_includes workflow, "actions/deploy-pages@v4"
   end
 
