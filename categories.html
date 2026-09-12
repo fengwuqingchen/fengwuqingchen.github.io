@@ -1,0 +1,50 @@
+---
+layout: default
+title: 分类
+permalink: /categories/
+---
+<section class="page shell category-shell">
+  <header class="post-header">
+    <p class="eyebrow">CATEGORIES</p>
+    <h1>文章分类</h1>
+    <p class="category-intro">按主题浏览这里的全部记录。</p>
+  </header>
+
+  <div class="category-archive">
+    {% for category in site.data.categories %}
+      {% assign post_count = 0 %}
+      {% for post in site.posts %}
+        {% if post.categories contains category.slug %}
+          {% assign post_count = post_count | plus: 1 %}
+        {% endif %}
+      {% endfor %}
+
+      <article class="category-group" id="{{ category.slug }}">
+        <header class="category-group-header">
+          <div>
+            <p class="category-command">category/{{ category.slug }}</p>
+            <h2>{{ category.name }}</h2>
+          </div>
+          <span>{{ post_count }} 篇</span>
+        </header>
+        <p class="category-description">{{ category.description }}</p>
+
+        {% if post_count > 0 %}
+          <ol class="category-posts">
+            {% for post in site.posts %}
+              {% if post.categories contains category.slug %}
+                <li>
+                  <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: '%Y.%m.%d' }}</time>
+                  <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p class="category-empty">这个分类还没有文章。</p>
+        {% endif %}
+      </article>
+    {% endfor %}
+  </div>
+</section>
+

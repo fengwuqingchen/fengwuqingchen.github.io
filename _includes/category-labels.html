@@ -1,0 +1,13 @@
+{% if include.categories and include.categories != empty %}
+  <div class="category-tags" aria-label="文章分类">
+    {% for category_slug in include.categories %}
+      {% assign category = site.data.categories | where: "slug", category_slug | first %}
+      {% if category %}
+        <a class="category-tag" href="{{ '/categories/' | append: '#' | append: category.slug | relative_url }}">{{ category.name }}</a>
+      {% else %}
+        <span class="category-tag category-tag-unknown">{{ category_slug }}</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
+

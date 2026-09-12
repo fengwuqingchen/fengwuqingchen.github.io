@@ -1,0 +1,16 @@
+- slug: tech
+  name: 技术
+  description: 编程、工具与技术实践。
+
+- slug: projects
+  name: 项目
+  description: 正在制作或已经完成的项目记录。
+
+- slug: notes
+  name: 随笔
+  description: 阶段性的想法、观察与读书笔记。
+
+- slug: life
+  name: 日常
+  description: 工作之外值得留下的生活片段。
+

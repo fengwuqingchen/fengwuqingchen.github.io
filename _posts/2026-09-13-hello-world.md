@@ -1,6 +1,7 @@
 ---
 title: "你好，世界"
 description: "这是博客的第一篇文章，也是一个长期写作计划的起点。"
+categories: [notes]
 tags: [随笔]
 ---
 
@@ -13,4 +14,3 @@ tags: [随笔]
 接下来，文章会以 Markdown 文件的形式存放在 GitHub 仓库的 `_posts` 文件夹中。每次添加或修改文章并提交后，GitHub Pages 都会自动构建和发布网站。
 
 保持好奇，持续记录。
-

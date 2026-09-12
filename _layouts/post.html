@@ -12,9 +12,9 @@ layout: default
         <span>{{ page.tags | join: ' / ' }}</span>
       {% endif %}
     </div>
+    {% include category-labels.html categories=page.categories %}
   </header>
   <div class="prose">
     {{ content }}
   </div>
 </article>
-

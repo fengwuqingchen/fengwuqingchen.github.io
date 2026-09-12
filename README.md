@@ -12,7 +12,8 @@
    ---
    title: "文章标题"
    description: "一句话摘要"
-   tags: [分类]
+   categories: [tech]
+   tags: [关键词]
    ---
    ```
 
@@ -20,6 +21,24 @@
 5. GitHub Pages 会自动构建，通常一两分钟后线上博客就会更新。
 
 可以复制 `_drafts/article-template.md` 作为模板。草稿放在 `_drafts` 中不会公开；写完后移动到 `_posts` 并按日期重命名即可发布。
+
+## 管理文章分类
+
+所有分类统一配置在 `_data/categories.yml`。每个分类包含：
+
+```yaml
+- slug: tech
+  name: 技术
+  description: 编程、工具与技术实践。
+```
+
+文章通过 `categories` 引用分类的 `slug`，支持一个或多个分类：
+
+```yaml
+categories: [tech, projects]
+```
+
+新增分类时，先在 `_data/categories.yml` 中添加配置，再在文章中使用对应的 `slug`。博客的分类导航、分类页和文章标签会自动更新。
 
 ## 修改博客信息
 
@@ -34,4 +53,3 @@
 ```bash
 bundle exec jekyll serve
 ```
-
