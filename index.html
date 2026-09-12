@@ -17,15 +17,14 @@ title: 首页
   {% if site.posts.size > 0 %}
     <ol class="post-list">
       {% for post in site.posts %}
-        <li>
-          <a class="post-card" href="{{ post.url | relative_url }}">
-            <div class="post-card-main">
-              <p class="post-date">{{ post.date | date: '%Y.%m.%d' }}</p>
-              <h3>{{ post.title }}</h3>
-              {% if post.description %}<p>{{ post.description }}</p>{% endif %}
-            </div>
-            <span class="post-arrow" aria-hidden="true">↗</span>
-          </a>
+        <li class="post-card">
+          <div class="post-card-main">
+            <p class="post-date">{{ post.date | date: '%Y.%m.%d' }}</p>
+            <h3><a class="post-title-link" href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
+            {% if post.description %}<p class="post-description">{{ post.description }}</p>{% endif %}
+            {% include category-labels.html categories=post.categories %}
+          </div>
+          <a class="post-arrow" href="{{ post.url | relative_url }}" aria-label="阅读《{{ post.title }}》">↗</a>
         </li>
       {% endfor %}
     </ol>
@@ -33,4 +32,3 @@ title: 首页
     <p class="empty-state">第一篇文章正在路上。</p>
   {% endif %}
 </section>
-

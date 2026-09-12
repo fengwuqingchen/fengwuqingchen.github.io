@@ -1,7 +1,8 @@
 ---
 title: "文章标题"
 description: "用一句话概括这篇文章。"
-tags: [分类]
+categories: [tech]
+tags: [关键词]
 ---
 
 在这里开始写正文。
@@ -13,4 +14,3 @@ tags: [分类]
 ```text
 hello, world
 ```
-
