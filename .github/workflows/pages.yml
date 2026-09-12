@@ -41,6 +41,9 @@ jobs:
           source: ./
           destination: ./_site
 
+      - name: Make the generated site writable
+        run: sudo chown -R "$USER":"$USER" _site
+
       - name: Build Pagefind search index
         run: npm run search:index
 
