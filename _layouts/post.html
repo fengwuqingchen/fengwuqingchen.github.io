@@ -1,0 +1,20 @@
+---
+layout: default
+---
+<article class="post shell prose-shell">
+  <header class="post-header">
+    <a class="eyebrow back-link" href="{{ '/' | relative_url }}">← 返回文章列表</a>
+    <h1>{{ page.title }}</h1>
+    <div class="post-meta">
+      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y 年 %-m 月 %-d 日' }}</time>
+      {% if page.tags.size > 0 %}
+        <span aria-hidden="true">·</span>
+        <span>{{ page.tags | join: ' / ' }}</span>
+      {% endif %}
+    </div>
+  </header>
+  <div class="prose">
+    {{ content }}
+  </div>
+</article>
+

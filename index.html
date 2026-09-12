@@ -1,0 +1,36 @@
+---
+layout: default
+title: 首页
+---
+<section class="intro shell">
+  <p class="eyebrow">FIELD NOTES · 个人记录</p>
+  <h1>把值得记住的事，<br><em>认真写下来。</em></h1>
+  <p class="intro-copy">关于技术、创作与日常的长期笔记。没有信息流，只有一些经过思考的文字。</p>
+</section>
+
+<section class="posts shell" aria-labelledby="posts-title">
+  <div class="section-heading">
+    <h2 id="posts-title">最近文章</h2>
+    <span>{{ site.posts | size }} 篇</span>
+  </div>
+
+  {% if site.posts.size > 0 %}
+    <ol class="post-list">
+      {% for post in site.posts %}
+        <li>
+          <a class="post-card" href="{{ post.url | relative_url }}">
+            <div class="post-card-main">
+              <p class="post-date">{{ post.date | date: '%Y.%m.%d' }}</p>
+              <h3>{{ post.title }}</h3>
+              {% if post.description %}<p>{{ post.description }}</p>{% endif %}
+            </div>
+            <span class="post-arrow" aria-hidden="true">↗</span>
+          </a>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="empty-state">第一篇文章正在路上。</p>
+  {% endif %}
+</section>
+
