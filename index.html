@@ -1,17 +1,80 @@
 ---
 layout: default
 title: 首页
+search_exclude: true
 ---
-<section class="intro shell">
-  <p class="eyebrow">FIELD NOTES · 个人记录</p>
-  <h1>把值得记住的事，<br><em>认真写下来。</em></h1>
-  <p class="intro-copy">关于技术、创作与日常的长期笔记。没有信息流，只有一些经过思考的文字。</p>
+<section class="intro">
+  <div class="shell intro-inner">
+    <div class="intro-copy-block">
+      <p class="eyebrow">FIELD NOTES · 个人记录</p>
+      <h1><span>唤起一天明月，</span><span>照我满怀冰雪</span></h1>
+      <p class="intro-copy">关于技术、创作与日常的长期笔记。<br>在喧闹之外，保存一些清醒而明亮的文字。</p>
+      <div class="intro-actions">
+        <a class="primary-link" href="#posts-title">阅读文章 <span aria-hidden="true">↓</span></a>
+        <button class="text-link" type="button" data-search-open>搜索内容 <span aria-hidden="true">⌕</span></button>
+      </div>
+    </div>
+
+    <figure class="moon-figure">
+      <svg class="moon-scene" viewBox="0 0 680 570" role="img" aria-labelledby="moon-scene-title moon-scene-description">
+        <title id="moon-scene-title">明月照映冰川</title>
+        <desc id="moon-scene-description">一轮明月悬在远山与冰面之上，星光沿着细线静静流动。</desc>
+        <defs>
+          <radialGradient id="moon-glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0" stop-color="#fffdf2" stop-opacity=".95"></stop>
+            <stop offset=".48" stop-color="#dcebf0" stop-opacity=".35"></stop>
+            <stop offset="1" stop-color="#b9ddea" stop-opacity="0"></stop>
+          </radialGradient>
+          <linearGradient id="ice-fill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#b9ddea" stop-opacity=".28"></stop>
+            <stop offset="1" stop-color="#b9ddea" stop-opacity="0"></stop>
+          </linearGradient>
+          <filter id="soft-glow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="9"></feGaussianBlur>
+          </filter>
+        </defs>
+
+        <g class="scene-grid" aria-hidden="true">
+          <path d="M46 110H634M46 190H634M46 270H634M46 350H634M46 430H634"></path>
+          <path d="M110 56V500M220 56V500M330 56V500M440 56V500M550 56V500"></path>
+          <path class="orbit" d="M112 280A230 230 0 0 1 568 280"></path>
+        </g>
+
+        <g class="moon-group">
+          <circle class="moon-halo" cx="452" cy="170" r="122" fill="url(#moon-glow)"></circle>
+          <circle class="moon-blur" cx="452" cy="170" r="66" filter="url(#soft-glow)"></circle>
+          <circle class="moon-disc" cx="452" cy="170" r="64"></circle>
+          <path class="moon-detail" d="M420 146c16-12 26-6 38-10 10-3 17-11 25-7M425 184c11-5 18-3 28 2 9 5 18 4 28-2"></path>
+        </g>
+
+        <g class="stars" aria-hidden="true">
+          <circle cx="153" cy="132" r="2"></circle><circle cx="250" cy="87" r="1.5"></circle>
+          <circle cx="328" cy="155" r="1.7"></circle><circle cx="579" cy="116" r="1.4"></circle>
+          <path d="M197 191h12M203 185v12M555 236h9M559.5 231.5v9"></path>
+        </g>
+
+        <g class="mountains" aria-hidden="true">
+          <path class="ridge-back" d="M38 399 123 327l58 49 77-117 70 88 49-39 88 82 61-64 116 85"></path>
+          <path class="ridge-front" d="M23 433 139 350l60 62 91-105 78 103 70-75 99 86 54-36 69 49v80H23Z" fill="url(#ice-fill)"></path>
+          <path class="ice-line" d="m139 350 16 77m135-120 16 128m132-100 8 102m91-16 8 29"></path>
+          <path class="reflection" d="M126 474c79-18 137-17 215 0s141 17 226-2M198 500c58-9 104-6 146 3s87 10 139 0"></path>
+        </g>
+
+        <g class="scene-labels" aria-hidden="true">
+          <text x="48" y="78">31.2304° N · NIGHT LOG</text>
+          <text x="510" y="530">MOON / 01</text>
+          <path d="M48 88h74M584 510h48"></path>
+        </g>
+      </svg>
+      <figcaption><span>月白终端</span><span>安静、清醒、持续记录</span></figcaption>
+    </figure>
+  </div>
 </section>
 
 <section class="posts shell" aria-labelledby="posts-title">
   <div class="section-heading">
     <h2 id="posts-title">最近文章</h2>
-    <span>{{ site.posts | size }} 篇</span>
+    <span>{{ site.posts | size | prepend: '0' }} 篇记录</span>
   </div>
 
   {% if site.posts.size > 0 %}

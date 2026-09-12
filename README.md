@@ -53,3 +53,12 @@ categories: [tech, projects]
 ```bash
 bundle exec jekyll serve
 ```
+
+需要同时验证全文搜索时，在 Jekyll 构建完成后运行：
+
+```bash
+npm ci
+npm run search:index
+```
+
+推送到 `main` 后，GitHub Actions 会依次构建 Jekyll、生成中文全文索引并发布到 GitHub Pages。

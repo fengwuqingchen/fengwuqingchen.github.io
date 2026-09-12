@@ -1,16 +1,21 @@
 ---
 layout: default
 ---
-<article class="post shell prose-shell">
+<article class="post shell prose-shell" data-pagefind-body>
   <header class="post-header">
     <a class="eyebrow back-link" href="{{ '/' | relative_url }}">← 返回文章列表</a>
-    <h1>{{ page.title }}</h1>
+    <h1 data-pagefind-meta="title">{{ page.title }}</h1>
     <div class="post-meta">
-      <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: '%Y 年 %-m 月 %-d 日' }}</time>
+      <time datetime="{{ page.date | date_to_xmlschema }}" data-pagefind-meta="date">{{ page.date | date: '%Y 年 %-m 月 %-d 日' }}</time>
       {% if page.tags.size > 0 %}
         <span aria-hidden="true">·</span>
         <span>{{ page.tags | join: ' / ' }}</span>
       {% endif %}
+    </div>
+    <div class="pagefind-data" aria-hidden="true">
+      {% for category_slug in page.categories %}
+        <span data-pagefind-filter="category:{{ category_slug }}" data-pagefind-meta="category">{{ category_slug }}</span>
+      {% endfor %}
     </div>
     {% include category-labels.html categories=page.categories %}
   </header>

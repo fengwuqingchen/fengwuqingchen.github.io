@@ -13,30 +13,72 @@
   </head>
   <body>
     <a class="skip-link" href="#content">跳到正文</a>
-    <header class="site-header">
+    <header class="site-header" data-pagefind-ignore="all">
       <div class="shell header-inner">
         <a class="brand" href="{{ '/' | relative_url }}" aria-label="返回首页">
-          <span class="brand-mark" aria-hidden="true">风</span>
-          <span>{{ site.title }}</span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <circle cx="17" cy="14" r="8"></circle>
+              <path d="M5 24c5-4 9-3 13-1s7 2 10-1"></path>
+            </svg>
+          </span>
+          <span class="brand-name">{{ site.title }}</span>
         </a>
-        <nav class="site-nav" aria-label="主导航">
-          <a href="{{ '/' | relative_url }}">文章</a>
-          <a href="{{ '/categories/' | relative_url }}">分类</a>
-          <a href="{{ '/about/' | relative_url }}">关于</a>
-          <a href="{{ '/feed.xml' | relative_url }}">订阅</a>
-        </nav>
+        <div class="header-actions">
+          <nav class="site-nav" aria-label="主导航">
+            <a href="{{ '/' | relative_url }}">文章</a>
+            <a href="{{ '/categories/' | relative_url }}">分类</a>
+            <a href="{{ '/about/' | relative_url }}">关于</a>
+          </nav>
+          <button class="search-trigger" type="button" data-search-open aria-haspopup="dialog" aria-controls="search-dialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+            <span>搜索</span>
+            <kbd aria-hidden="true">/</kbd>
+          </button>
+        </div>
       </div>
     </header>
 
-    <main id="content">
+    <main id="content"{% if page.search_exclude %} data-pagefind-ignore="all"{% endif %}>
       {{ content }}
     </main>
 
-    <footer class="site-footer">
+    <footer class="site-footer" data-pagefind-ignore="all">
       <div class="shell footer-inner">
         <p>© {{ 'now' | date: '%Y' }} {{ site.author.name }}。文字留在这里，时间继续向前。</p>
-        <a href="https://github.com/fengwuqingchen">GitHub</a>
+        <div class="footer-links">
+          <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+          <a href="https://github.com/fengwuqingchen">GitHub</a>
+        </div>
       </div>
     </footer>
+
+    <div class="search-layer" id="search-dialog" hidden data-pagefind-ignore="all">
+      <button class="search-backdrop" type="button" data-search-close tabindex="-1" aria-label="关闭搜索"></button>
+      <section class="search-panel" role="dialog" aria-modal="true" aria-labelledby="search-title">
+        <header class="search-panel-header">
+          <div>
+            <p class="eyebrow">SEARCH / 全文检索</p>
+            <h2 id="search-title">在文字中寻找</h2>
+          </div>
+          <button class="search-close" type="button" data-search-close aria-label="关闭搜索">×</button>
+        </header>
+        <label class="search-field" for="search-input">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+          <input id="search-input" type="search" autocomplete="off" placeholder="搜索文章、正文或分类…" aria-describedby="search-status">
+          <kbd aria-hidden="true">ESC</kbd>
+        </label>
+        <div class="search-filters" aria-label="按分类筛选">
+          <button class="search-filter is-active" type="button" data-search-category="" aria-pressed="true">全部</button>
+          {% for category in site.data.categories %}
+            <button class="search-filter" type="button" data-search-category="{{ category.slug }}" aria-pressed="false">{{ category.name }}</button>
+          {% endfor %}
+        </div>
+        <p class="search-status" id="search-status" aria-live="polite">请输入标题、正文或分类关键词</p>
+        <ol class="search-results" id="search-results"></ol>
+        <p class="search-help"><span><kbd>↑</kbd><kbd>↓</kbd> 浏览结果</span><span><kbd>Enter</kbd> 打开文章</span></p>
+      </section>
+    </div>
+    <script src="{{ '/assets/js/search.js' | relative_url }}" data-pagefind-base="{{ '/pagefind/' | relative_url }}" defer></script>
   </body>
 </html>

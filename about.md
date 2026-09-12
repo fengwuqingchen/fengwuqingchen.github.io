@@ -2,6 +2,7 @@
 layout: default
 title: 关于
 permalink: /about/
+search_exclude: true
 ---
 <article class="page shell prose-shell">
   <header class="post-header">
@@ -13,4 +14,3 @@ permalink: /about/
     <p>博客托管在 GitHub Pages 上。每一次提交，都会成为它继续生长的一部分。</p>
   </div>
 </article>
-
