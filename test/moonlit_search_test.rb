@@ -47,6 +47,14 @@ class MoonlitSearchTest < Minitest::Test
     assert_match(/\.search-trigger\s*\{[^}]*width:\s*clamp\(/m, stylesheet)
   end
 
+  def test_footer_includes_a_clickable_qq_email_contact
+    layout = read("_layouts/default.html")
+
+    assert_includes layout, 'href="mailto:1958898938@qq.com"'
+    assert_includes layout, "QQ 邮箱"
+    assert_includes layout, "1958898938@qq.com"
+  end
+
   def test_article_uses_a_centered_reading_column_and_quiet_header
     post_layout = read("_layouts/post.html")
     stylesheet = read("assets/css/style.css")
