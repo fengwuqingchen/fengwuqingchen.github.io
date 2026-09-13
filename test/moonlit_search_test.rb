@@ -6,13 +6,54 @@ require "minitest/autorun"
 class MoonlitSearchTest < Minitest::Test
   ROOT = File.expand_path("..", __dir__)
 
-  def test_homepage_uses_the_requested_moonlit_statement_and_inline_svg
+  def test_homepage_uses_the_requested_statement_without_extra_slogan
     homepage = read("index.html")
 
     assert_includes homepage, "唤起一天明月"
     assert_includes homepage, "照我满怀冰雪"
-    assert_match(/<svg[^>]+class="[^"]*moon-scene/, homepage)
-    assert_includes homepage, "<title id=\"moon-scene-title\">"
+    refute_includes homepage, "在喧闹之外"
+    assert_includes homepage, "terminal-line"
+    assert_includes homepage, "$ cat ./intro.md"
+  end
+
+  def test_moon_is_a_fixed_site_wide_background
+    layout = read("_layouts/default.html")
+    stylesheet = read("assets/css/style.css")
+
+    assert_includes layout, "site-atmosphere"
+    assert_includes layout, "moon-backdrop"
+    assert_includes layout, "<title id=\"moon-backdrop-title\">"
+    assert_match(/\.site-atmosphere\s*\{[^}]*position:\s*fixed/m, stylesheet)
+  end
+
+  def test_light_and_dark_themes_are_user_selectable_and_persisted
+    layout = read("_layouts/default.html")
+    script = read("assets/js/theme.js")
+    stylesheet = read("assets/css/style.css")
+
+    assert_includes layout, "data-theme-toggle"
+    assert_includes layout, "assets/js/theme.js"
+    assert_includes script, "prefers-color-scheme: dark"
+    assert_includes script, "localStorage"
+    assert_includes stylesheet, '[data-theme="dark"]'
+  end
+
+  def test_terminal_language_and_a_long_search_control_are_visible
+    layout = read("_layouts/default.html")
+    stylesheet = read("assets/css/style.css")
+
+    assert_includes layout, "&gt;_"
+    assert_includes layout, "STATUS: ONLINE"
+    assert_match(/\.search-trigger\s*\{[^}]*width:\s*clamp\(/m, stylesheet)
+  end
+
+  def test_article_uses_a_centered_reading_column_and_quiet_header
+    post_layout = read("_layouts/post.html")
+    stylesheet = read("assets/css/style.css")
+
+    assert_includes post_layout, "reading-shell"
+    assert_includes post_layout, "article-path"
+    assert_match(/\.reading-shell\s*\{[^}]*max-width:\s*760px/m, stylesheet)
   end
 
   def test_search_is_available_as_an_accessible_dialog
