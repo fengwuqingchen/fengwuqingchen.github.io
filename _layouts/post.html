@@ -1,14 +1,15 @@
 ---
 layout: default
 ---
-<article class="post shell prose-shell" data-pagefind-body>
+<article class="post reading-shell" data-pagefind-body>
   <header class="post-header">
-    <a class="eyebrow back-link" href="{{ '/' | relative_url }}">← 返回文章列表</a>
+    <a class="back-link" href="{{ '/' | relative_url }}">cd ../posts</a>
+    <p class="article-path">~/posts/{{ page.slug }}.md</p>
     <h1 data-pagefind-meta="title">{{ page.title }}</h1>
     <div class="post-meta">
       <time datetime="{{ page.date | date_to_xmlschema }}" data-pagefind-meta="date">{{ page.date | date: '%Y 年 %-m 月 %-d 日' }}</time>
       {% if page.tags.size > 0 %}
-        <span aria-hidden="true">·</span>
+        <span aria-hidden="true">::</span>
         <span>{{ page.tags | join: ' / ' }}</span>
       {% endif %}
     </div>
@@ -22,4 +23,8 @@ layout: default
   <div class="prose">
     {{ content }}
   </div>
+  <footer class="post-end" data-pagefind-ignore="all">
+    <span>EOF</span>
+    <a href="{{ '/' | relative_url }}">返回文章列表 ↑</a>
+  </footer>
 </article>
