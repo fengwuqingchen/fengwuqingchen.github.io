@@ -1,30 +1,38 @@
 ---
 layout: default
 ---
-<article class="post reading-shell" data-pagefind-body>
-  <header class="post-header">
-    <a class="back-link" href="{{ '/' | relative_url }}">cd ../posts</a>
-    <p class="article-path">~/posts/{{ page.slug }}.md</p>
-    <h1 data-pagefind-meta="title">{{ page.title }}</h1>
-    <div class="post-meta">
-      <time datetime="{{ page.date | date_to_xmlschema }}" data-pagefind-meta="date">{{ page.date | date: '%Y 年 %-m 月 %-d 日' }}</time>
-      {% if page.tags.size > 0 %}
-        <span aria-hidden="true">::</span>
-        <span>{{ page.tags | join: ' / ' }}</span>
-      {% endif %}
+<div class="article-layout">
+  <aside class="article-toc" data-article-toc hidden aria-label="文章目录" data-pagefind-ignore="all">
+    <p class="article-toc-label">目录 / ON THIS PAGE</p>
+    <ol data-article-toc-list></ol>
+  </aside>
+
+  <article class="post reading-shell" data-pagefind-body>
+    <header class="post-header">
+      <a class="back-link" href="{{ '/' | relative_url }}">cd ../posts</a>
+      <p class="article-path">~/posts/{{ page.slug }}.md</p>
+      <h1 data-pagefind-meta="title">{{ page.title }}</h1>
+      <div class="post-meta">
+        <time datetime="{{ page.date | date_to_xmlschema }}" data-pagefind-meta="date">{{ page.date | date: '%Y 年 %-m 月 %-d 日' }}</time>
+        {% if page.tags.size > 0 %}
+          <span aria-hidden="true">::</span>
+          <span>{{ page.tags | join: ' / ' }}</span>
+        {% endif %}
+      </div>
+      <div class="pagefind-data" aria-hidden="true">
+        {% for category_slug in page.categories %}
+          <span data-pagefind-filter="category:{{ category_slug }}" data-pagefind-meta="category">{{ category_slug }}</span>
+        {% endfor %}
+      </div>
+      {% include category-labels.html categories=page.categories %}
+    </header>
+    <div class="prose">
+      {{ content }}
     </div>
-    <div class="pagefind-data" aria-hidden="true">
-      {% for category_slug in page.categories %}
-        <span data-pagefind-filter="category:{{ category_slug }}" data-pagefind-meta="category">{{ category_slug }}</span>
-      {% endfor %}
-    </div>
-    {% include category-labels.html categories=page.categories %}
-  </header>
-  <div class="prose">
-    {{ content }}
-  </div>
-  <footer class="post-end" data-pagefind-ignore="all">
-    <span>EOF</span>
-    <a href="{{ '/' | relative_url }}">返回文章列表 ↑</a>
-  </footer>
-</article>
+    <footer class="post-end" data-pagefind-ignore="all">
+      <span>EOF</span>
+      <a href="{{ '/' | relative_url }}">返回文章列表 ↑</a>
+    </footer>
+  </article>
+</div>
+<script src="{{ '/assets/js/article-toc.js' | relative_url }}" defer></script>
