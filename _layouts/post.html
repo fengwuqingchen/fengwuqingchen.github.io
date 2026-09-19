@@ -1,6 +1,9 @@
 ---
 layout: default
 ---
+{% assign article_plaintext = content | strip_html | strip_newlines | replace: " ", "" | replace: "　", "" %}
+{% assign article_character_count = article_plaintext | size %}
+{% assign article_reading_minutes = article_character_count | plus: 399 | divided_by: 400 %}
 <div class="article-layout">
   <aside class="article-toc" data-article-toc hidden aria-label="文章目录" data-pagefind-ignore="all">
     <p class="article-toc-label">目录 / ON THIS PAGE</p>
@@ -17,6 +20,14 @@ layout: default
         {% if page.tags.size > 0 %}
           <span aria-hidden="true">::</span>
           <span>{{ page.tags | join: ' / ' }}</span>
+        {% endif %}
+        {% if article_character_count > 0 %}
+          <span class="post-reading-meta">
+            <span aria-hidden="true">::</span>
+            <span data-article-word-count>{{ article_character_count }} 字</span>
+            <span aria-hidden="true">::</span>
+            <span data-article-reading-time>预计 {{ article_reading_minutes }} 分钟</span>
+          </span>
         {% endif %}
         <span class="post-view-meta" data-page-views hidden>
           <span aria-hidden="true">::</span>
