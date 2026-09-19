@@ -18,6 +18,9 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
     <link rel="icon" type="image/svg+xml" href="{{ '/assets/favicon.svg' | relative_url }}">
+    {% if site.analytics.goatcounter_endpoint %}
+      <script id="goatcounter-script" data-goatcounter="{{ site.analytics.goatcounter_endpoint }}" async src="https://gc.zgo.at/count.js"></script>
+    {% endif %}
   </head>
   <body>
     <a class="skip-link" href="#content">跳到正文</a>

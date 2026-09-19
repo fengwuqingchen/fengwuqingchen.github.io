@@ -18,6 +18,10 @@ layout: default
           <span aria-hidden="true">::</span>
           <span>{{ page.tags | join: ' / ' }}</span>
         {% endif %}
+        <span class="post-view-meta" data-page-views hidden>
+          <span aria-hidden="true">::</span>
+          <span class="post-views" aria-live="polite"></span>
+        </span>
       </div>
       <div class="pagefind-data" aria-hidden="true">
         {% for category_slug in page.categories %}
@@ -36,3 +40,4 @@ layout: default
   </article>
 </div>
 <script src="{{ '/assets/js/article-toc.js' | relative_url }}" defer></script>
+<script src="{{ '/assets/js/page-views.js' | relative_url }}" defer></script>

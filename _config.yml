@@ -11,6 +11,9 @@ future: false
 author:
   name: 风清
 
+analytics:
+  goatcounter_endpoint: "https://fengqing.goatcounter.com/count"
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
