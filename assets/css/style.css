@@ -732,7 +732,7 @@ a.category-tag:hover { border-color: var(--accent); background: var(--accent-sof
 .prose pre :is(.k, .kd, .kn, .kp, .kr, .kc, .kt, .ow) { color: #c6a7f2; }
 .prose pre :is(.s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sr, .ss, .sx) { color: #a7d8a3; }
 .prose pre :is(.m, .mi, .mf, .mh, .mo, .il, .mb) { color: #edbe85; }
-.prose pre :is(.na, .nt, .nv, .vc, .vg, .vi) { color: #8ccde6; }
+.prose pre :is(.na, .nl, .nt, .nv, .vc, .vg, .vi) { color: #8ccde6; }
 .prose pre :is(.nf, .fm, .nc, .nn, .nb, .ne) { color: #eed28a; }
 .prose pre :is(.o, .p) { color: #b9c7c2; }
 .prose pre :is(.err, .gd) { color: #f39393; }
