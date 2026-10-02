@@ -1,5 +1,5 @@
 ---
-title: 重新看一下 paperclip
+title: paperclip 的设计、部分重要字段
 description: 一个设计理念笔记宏大的多 agent 系统
 categories:
 - tech
