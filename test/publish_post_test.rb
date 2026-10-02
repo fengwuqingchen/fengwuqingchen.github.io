@@ -103,4 +103,93 @@ class PublishPostTest < Minitest::Test
     importer.write
     assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "已存在"
   end
+
+  def test_recursively_publishes_two_reference_levels_and_relative_assets
+    FileUtils.mkdir_p(File.join(@source_dir, "notes"))
+    File.write(File.join(@source_dir, "notes", "first.md"), "[[second#detail|深入]]\n![图](../attachments/my%20image.png)\n")
+    File.write(File.join(@source_dir, "notes", "second.md"), "## detail\n[附件](../report%20(1).pdf)\n")
+    write_source("[[notes/first|资料]]\n[重复](notes/first.md)\n![[notes/first.md]]\n")
+    importer = publisher
+    result = importer.plan
+    assert_equal 2, result[:references].size
+    assert_equal 2, result[:resources].size
+    importer.write
+    assert_equal 2, Dir.children(File.join(@repo, "_references")).size
+    root = File.read(File.join(@repo, result[:post]))
+    assert_equal 3, root.scan(%r{\(/references/}).size
+    result[:references].each do |note|
+      content = File.read(File.join(@repo, note[:destination]))
+      assert_includes content, "ai_generated: true"
+      assert_includes content, "reference_only: true"
+      assert_includes content, "search_exclude: true"
+      assert_includes content, "render_with_liquid: false"
+    end
+    first = result[:references].find { |note| note[:source].end_with?("first.md") }
+    assert_includes File.read(File.join(@repo, first[:destination])), "#detail)"
+    assert_equal "[[second#detail|深入]]\n![图](../attachments/my%20image.png)\n", File.read(first[:source])
+  end
+
+  def test_depth_and_cycles_fail_without_writing
+    write_source("[[a]]")
+    File.write(File.join(@source_dir, "a.md"), "[[b]]")
+    File.write(File.join(@source_dir, "b.md"), "[[c]]")
+    File.write(File.join(@source_dir, "c.md"), "third level")
+    assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "两层"
+    File.write(File.join(@source_dir, "a.md"), "[[a]]")
+    assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "循环引用"
+    assert_empty Dir.children(File.join(@repo, "_posts"))
+    refute File.exist?(File.join(@repo, "_references"))
+  end
+
+  def test_shared_reference_is_checked_at_each_depth
+    write_source("[[b]]\n[[a]]")
+    File.write(File.join(@source_dir, "a.md"), "[[b]]")
+    File.write(File.join(@source_dir, "b.md"), "[[c]]")
+    File.write(File.join(@source_dir, "c.md"), "leaf")
+    assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "两层"
+  end
+
+  def test_front_matter_free_root_is_an_ai_reference_not_a_post
+    File.write(@source, "# 自动生成\ntext")
+    importer = publisher
+    result = importer.plan
+    assert_equal "_references/test-post.md", result[:post]
+    assert_equal "/references/test-post/", result[:url]
+    importer.write
+    assert_empty Dir.children(File.join(@repo, "_posts"))
+    assert_includes File.read(File.join(@repo, result[:post])), "ai_generated: true"
+    assert_includes File.read(File.join(@repo, result[:post])), "search_exclude: true"
+  end
+
+  def test_yaml_reference_preserves_author_metadata_but_forces_unlisted
+    write_source("[资料](first.md)")
+    File.write(File.join(@source_dir, "first.md"), "---\ntitle: 人工资料\nai_generated: false\nsearch_exclude: false\npermalink: /\n---\ntext")
+    importer = publisher
+    result = importer.plan
+    importer.write
+    note = File.read(File.join(@repo, result[:references].first[:destination]))
+    assert_includes note, "ai_generated: false"
+    assert_includes note, "search_exclude: true"
+    assert_match(%r{permalink: ["']?/references/}, note)
+  end
+
+  def test_reference_assets_and_markdown_sizes_are_checked
+    write_source("[[first]]")
+    File.write(File.join(@source_dir, "first.md"), "![图](attachments/my%20image.png)")
+    assert_includes assert_raises(RuntimeError) { publisher(image_mb: 0.000001).plan }.message, "资源过大"
+    assert_includes assert_raises(RuntimeError) { publisher(attachment_mb: 0.000001).plan }.message, "引用文章过大"
+    assert_includes assert_raises(RuntimeError) { publisher(total_mb: 0.000001).plan }.message, "资源合计"
+  end
+
+  def test_hidden_reference_can_be_reused_by_another_publication
+    write_source("[[first]]")
+    File.write(File.join(@source_dir, "first.md"), "reference")
+    first = publisher
+    result = first.plan
+    first.write
+    second = publisher(slug: "another-post")
+    assert_equal result[:references].first[:url], second.plan[:references].first[:url]
+    second.write
+    assert_equal 1, Dir.children(File.join(@repo, "_references")).size
+  end
 end

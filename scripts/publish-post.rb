@@ -26,41 +26,52 @@ class PostPublisher
     @limits = [image_mb, attachment_mb, total_mb].map { |value| Float(value) * MIB }
     raise "大小限制必须大于零" unless @limits.all?(&:positive?)
     @resources = {}
+    @references = {}
+    @note_sizes = {}
+    @stack = []
   end
 
   def plan
     source_text = File.read(@source, encoding: "UTF-8")
     match = source_text.match(/\A---\r?\n(.*?)\r?\n---(?:\r?\n|\z)/m)
-    raise "文章必须包含 YAML front matter（title、categories、tags）" unless match
-    metadata = YAML.safe_load(match[1], permitted_classes: [Date, Time])
+    metadata = match ? YAML.safe_load(match[1], permitted_classes: [Date, Time]) : { "title" => File.basename(@source, ".md"), "ai_generated" => true }
     raise "YAML 必须是字段映射" unless metadata.is_a?(Hash)
     title = metadata["title"]
     raise "title 不能为空" unless title.is_a?(String) && !title.strip.empty?
     categories = Array(metadata["categories"])
     catalog = YAML.safe_load(File.read(File.join(@repo, "_data/categories.yml")))
     unknown = categories - catalog.map { |category| category.fetch("slug") }
-    raise "分类不能为空或未注册：#{unknown.join(', ')}" if categories.empty? || !unknown.empty?
+    reference_only = !match || metadata["ai_generated"] == true || metadata["reference_only"] == true
+    raise "分类不能为空或未注册：#{unknown.join(', ')}" if (!reference_only && categories.empty?) || !unknown.empty?
     metadata["categories"] = categories
     metadata["tags"] = Array(metadata["tags"])
 
     filename = File.basename(@source, File.extname(@source))
     filename_date = filename[/\A\d{4}-\d{1,2}-\d{1,2}/]
-    article_date = Date.parse(@date || filename_date || metadata["date"].to_s)
+    article_date = Date.parse(@date || filename_date || metadata["date"]&.to_s || Date.today.iso8601)
     raise "发布日期不能在未来" if article_date > Date.today
     @slug ||= filename.sub(/\A\d{4}-\d{1,2}-\d{1,2}-/, "").gsub(/\s+/, "-")
     raise "slug 只能包含文字、数字、下划线与短横线" unless @slug.match?(/\A[\p{L}\p{N}_-]+\z/u)
     @asset_prefix = "assets/posts/#{article_date.iso8601}-#{@slug}"
     @post_path = "_posts/#{article_date.iso8601}-#{@slug}.md"
-    raise "目标文章已存在：#{@post_path}；请直接编辑仓库中的文章" if File.exist?(File.join(@repo, @post_path))
+    raise "目标文章已存在：#{@post_path}；请直接编辑仓库中的文章" if !reference_only && File.exist?(File.join(@repo, @post_path))
 
-    body = rewrite_body(source_text[match.end(0)..])
-    total = @resources.values.sum { |resource| resource[:size] }
+    @stack << @source
+    body = rewrite_body(match ? source_text[match.end(0)..] : source_text)
+    @stack.pop
+    total = @resources.values.sum { |resource| resource[:size] } + @note_sizes.values.sum
     raise "资源合计 #{format_size(total)}，超过总限制 #{format_size(@limits[2])}" if total > @limits[2]
     metadata["date"] = article_date.iso8601
     metadata["render_with_liquid"] = false
+    if reference_only
+      metadata.merge!("reference_only" => true, "search_exclude" => true, "layout" => "post", "published" => true)
+      @post_path = "_references/#{@slug}.md"
+      metadata["permalink"] = "/references/#{@slug}/"
+      raise "目标文章已存在：#{@post_path}" if File.exist?(File.join(@repo, @post_path))
+    end
     @article = "#{YAML.dump(metadata)}---\n\n#{body}"
-    { post: @post_path, resources: @resources.values, total_bytes: total,
-      url: "/posts/#{@slug}/", title: title }
+    { post: @post_path, references: @references.values.map { |note| note.reject { |key, _| key == :content } }, resources: @resources.values, total_bytes: total,
+      url: reference_only ? "/references/#{@slug}/" : "/posts/#{@slug}/", title: title }
   end
 
   def write
@@ -70,10 +81,52 @@ class PostPublisher
       FileUtils.mkdir_p(File.dirname(destination))
       FileUtils.cp(resource[:source], destination)
     end
-    File.write(File.join(@repo, @post_path), @article)
+    @references.each_value { |note| write_note(note[:destination], note[:content]) }
+    write_note(@post_path, @article)
   end
 
   private
+
+  def write_note(path, content)
+    destination = File.join(@repo, path)
+    FileUtils.mkdir_p(File.dirname(destination))
+    File.write(destination, content)
+  end
+
+  def reference_url(path)
+    raise "引用嵌套不能超过两层：#{path}" if @stack.length > 2
+    raise "循环引用：#{(@stack + [path]).join(' → ')}" if @stack.include?(path)
+    size = File.size(path)
+    raise "引用文章过大：#{path}" if size > @limits[1]
+    @note_sizes[path] = size
+    source = File.read(path, encoding: "UTF-8")
+    match = source.match(/\A---\r?\n(.*?)\r?\n---(?:\r?\n|\z)/m)
+    metadata = match ? YAML.safe_load(match[1], permitted_classes: [Date, Time]) : { "ai_generated" => true }
+    raise "引用文章 YAML 必须是字段映射：#{path}" unless metadata.is_a?(Hash)
+    metadata["title"] ||= File.basename(path, File.extname(path))
+    metadata["date"] ||= File.mtime(path).strftime("%Y-%m-%d")
+    raise "引用文章 title 不能为空：#{path}" unless metadata["title"].is_a?(String) && !metadata["title"].strip.empty?
+    previous_source = @source
+    @source = path
+    @stack << path
+    begin
+      body = rewrite_body(match ? source[match.end(0)..] : source)
+    ensure
+      @stack.pop
+      @source = previous_source
+    end
+    metadata.merge!("layout" => "post", "reference_only" => true, "search_exclude" => true, "render_with_liquid" => false, "published" => true)
+    metadata.delete("permalink")
+    digest = Digest::SHA256.hexdigest(YAML.dump(metadata) + body)
+    url = "/references/#{digest}/"
+    metadata["permalink"] = url
+    content = "#{YAML.dump(metadata)}---\n\n#{body}"
+    destination = "_references/#{digest}.md"
+    existing = File.join(@repo, destination)
+    raise "引用文章目标冲突：#{destination}" if File.exist?(existing) && File.read(existing) != content
+    @references[digest] = { source: path, destination: destination, url: url, content: content }
+    url
+  end
 
   def format_size(bytes)
     format("%.2f MB", bytes.to_f / MIB)
@@ -104,7 +157,7 @@ class PostPublisher
       target, label = reference.split("|", 2)
       path, fragment = target.split("#", 2)
       extension = File.extname(path).downcase
-      raise "暂不支持发布 Obsidian 笔记链接/嵌入：#{target}，请改为公开 URL" if extension.empty? || extension == ".md"
+      target = "#{path}.md#{fragment ? '#' + fragment : ''}" if extension.empty?
       url = local_url(target)
       image = embedded == "!" && IMAGE_EXTENSIONS.include?(extension)
       label = File.basename(path) if label.nil? || label.match?(/\A\d+(?:x\d+)?\z/)
@@ -152,11 +205,13 @@ class PostPublisher
   def local_url(target)
     return target if target.empty? || target.start_with?("#", "//") || target.match?(/\A(?:https?|mailto|tel|data):/i)
     return target if @resources.values.any? { |resource| target.split(/[?#]/, 2).first == "/#{resource[:destination]}" }
+    return target if @references.values.any? { |note| target.split(/[?#]/, 2).first == note[:url] }
     raise "不支持的本地资源协议：#{target}" if target.match?(/\A\w+:/) && !target.start_with?("file:")
     raw_path, suffix = target.split(/(?=[?#])/, 2)
     raw_path = raw_path.sub(/\Afile:\/\//, "")
     raw_path = URI::DEFAULT_PARSER.unescape(raw_path).gsub(/\\([ ()])/, '\1')
     path = resolve_resource(raw_path)
+    return "#{reference_url(path)}#{suffix}" if File.extname(path).downcase == ".md"
     unless @resources.key?(path)
       extension = File.extname(path).downcase
       raise "不发布可执行或网页附件：#{path}" if BLOCKED_EXTENSIONS.include?(extension)
@@ -226,7 +281,7 @@ if $PROGRAM_NAME == __FILE__
       publisher.write
       if publish
         Dir.chdir(options[:repo]) do
-          paths = [result[:post]] + result[:resources].map { |resource| resource[:destination] }
+          paths = [result[:post]] + (result[:resources] + result[:references]).map { |resource| resource[:destination] }
           raise "Git 暂存失败" unless system("git", "add", "--", *paths)
           raise "Git 提交失败" unless system("git", "commit", "-m", "post: #{result[:title]}")
           raise "推送失败；文件与提交已保留，请重试 git push origin main" unless system("git", "push", "origin", "main")

@@ -13,8 +13,11 @@ layout: default
   <article class="post reading-shell" data-pagefind-body>
     <header class="post-header">
       <a class="back-link" href="{{ '/' | relative_url }}">cd ../posts</a>
-      <p class="article-path">~/posts/{{ page.slug }}.md</p>
+      <p class="article-path">{% if page.reference_only %}~/references/{{ page.title }}.md{% else %}~/posts/{{ page.slug }}.md{% endif %}</p>
       <h1 data-pagefind-meta="title">{{ page.title }}</h1>
+      {% if page.reference_only %}
+        <p class="reference-notice">{% if page.ai_generated %}AI 生成的引用资料{% else %}引用资料{% endif %} · 仅供辅助阅读，请核实其中的信息。</p>
+      {% endif %}
       <div class="post-meta">
         <time datetime="{{ page.date | date_to_xmlschema }}" data-pagefind-meta="date">{{ page.date | date: '%Y 年 %-m 月 %-d 日' }}</time>
         {% if page.tags.size > 0 %}

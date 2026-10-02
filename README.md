@@ -36,9 +36,21 @@ ruby scripts/publish-post.rb "/绝对路径/2026-10-2-文章.md" --slug article-
 ruby scripts/publish-post.rb "/绝对路径/2026-10-2-文章.md" --slug article-name --publish
 ```
 
-不加 `--publish` 时仅导入到仓库，可检查后手动提交。源 Markdown 和原附件不会修改。文章需要 YAML 中的 `title` 和已注册的 `categories`；日期从文件名读取，支持非补零日期，也可用 `--date YYYY-MM-DD` 指定。`--slug` 固定文章 URL，避免中文或空格带来的链接不便。
+不加 `--publish` 时仅导入到仓库，可检查后手动提交。源 Markdown 和原附件不会修改。普通文章需要 YAML 中的 `title` 和已注册的 `categories`；日期从文件名读取，支持非补零日期，也可用 `--date YYYY-MM-DD` 指定。`--slug` 固定文章 URL，避免中文或空格带来的链接不便。无 YAML front matter 的 Markdown 默认作为 AI 引用资料发布（不进入普通文章列表）；无日期时使用当天日期。
 
-支持 Obsidian `![[图片.png]]` / `[[附件.pdf]]`，普通 Markdown 图片、附件链接、引用式链接，以及 HTML 的 `src` / `href`。脚本在文章同目录与 `attachments` 中寻找资源；找不到时按文件名搜索文章所在目录，也可用 `--vault "/Obsidian库路径"` 搜索整个库。同名文件不唯一、链接缺失或超限会报错，校验全部成功后才写入。代码块中的示例链接不会作为附件导入；外部 URL 不会下载。Obsidian 的笔记链接/嵌入目前需要改成公开 URL 后再发布。
+支持 Obsidian `![[图片.png]]` / `[[附件.pdf]]`，普通 Markdown 图片、附件链接、引用式链接，以及 HTML 的 `src` / `href`。脚本在文章同目录与 `attachments` 中寻找资源；找不到时按文件名搜索文章所在目录，也可用 `--vault "/Obsidian库路径"` 搜索整个库。同名文件不唯一、链接缺失或超限会报错，校验全部成功后才写入。代码块中的示例链接不会作为附件导入；外部 URL 不会下载。
+
+### 仅供引用的文章 / AI 资料
+
+正文中的 `[[资料]]`、`[[资料.md|链接文字]]`、`[资料](资料.md)` 及引用式 Markdown 链接会递归导入本地笔记，改写成可点击的博客阅读页。`![[资料]]` 也转换为链接，不把整篇资料直接嵌入正文。文件名省略 `.md` 的写法仅支持 Obsidian 链接。引用文件中的图片、附件按该文件所在目录解析并一起上传。
+
+主文章为第 0 层，允许「主文章 → 引用资料（第 1 层）→ 引用资料（第 2 层）」。第 2 层再引用本地 Markdown、循环引用、文件缺失或同名歧义都会在写入前报错；外部网址不参与层数限制。清单中的 `references` 包含即将上传的引用文章。
+
+所有从正文递归导入的笔记都放在 `_references/`，不加入 `_posts/`：不出现在首页、分类、站内搜索或 RSS，搜索引擎也收到 `noindex` 指令。可以通过文章中的链接或直接 URL 阅读；这不是隐私保护或访问控制，公开仓库仍能查看原文。
+
+无 front matter 的资料自动设置 `ai_generated: true`，标题取文件名。有 YAML 的资料保留标题等元数据；可用 `ai_generated: true` 标明 AI 文，`ai_generated: false` 标明人工资料。引用资料一律强制隐藏于发现入口，不会因 YAML 中的分类、`search_exclude: false` 或自定义 `permalink` 而重新出现。
+
+若单独发布带 YAML 的 AI 文，设置 `ai_generated: true`；人工资料可设置 `reference_only: true`。这两种文章也会进入独立引用目录。引用 Markdown 自身受单附件上限约束，所有引用 Markdown、图片和附件共同计入整次上传的总上限。重复引用不会重复计入大小，正文和资源源文件均不会修改。已有普通文章的再编辑仍需在仓库中操作，本脚本不覆盖已发布的主文章。
 
 默认单张图片上限 10 MiB、单个其它附件 20 MiB、整篇资源合计 100 MiB，可以用 `--image-mb`、`--attachment-mb`、`--total-mb` 调整。资源按内容哈希命名并转换成公开的 `/assets/posts/…` 链接，保留原始文件，不会自动压缩。可执行文件和 HTML/JS 附件会拒绝发布。
 

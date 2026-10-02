@@ -8,6 +8,12 @@ permalink: /posts/:title/
 markdown: kramdown
 future: false
 
+# Reference documents are deliberately not posts: no home/archive/feed entries.
+collections:
+  references:
+    output: true
+    permalink: /references/:name/
+
 author:
   name: 风清
 
@@ -22,6 +28,13 @@ feed:
   path: feed.xml
 
 defaults:
+  - scope:
+      path: ""
+      type: references
+    values:
+      layout: post
+      reference_only: true
+      search_exclude: true
   - scope:
       path: ""
       type: posts

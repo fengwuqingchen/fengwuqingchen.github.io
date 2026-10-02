@@ -742,6 +742,7 @@ a.category-tag:hover { border-color: var(--accent); background: var(--accent-sof
 .prose pre .gi { color: #a7d8a3; }
 
 .prose code { font-family: var(--mono); }
+.reference-notice { color: var(--muted); font-family: var(--mono); font-size: .75rem; line-height: 1.7; }
 .prose :not(pre) > code { padding: .13em .34em; color: var(--accent); background: var(--accent-soft); font-size: .88em; }
 .prose img { max-width: 100%; height: auto; border: 1px solid var(--line); }
 
