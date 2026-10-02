@@ -24,7 +24,7 @@ search_exclude: true
         <header class="category-group-header">
           <div>
             <p class="category-command">category/{{ category.slug }}</p>
-            <h2>{{ category.name }}</h2>
+            <h2><a class="category-title-link" href="{{ '/categories/' | append: category.slug | append: '/' | relative_url }}">{{ category.name }} <span aria-hidden="true">→</span></a></h2>
           </div>
           <span>{{ post_count }} 篇</span>
         </header>

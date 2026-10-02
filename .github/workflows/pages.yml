@@ -35,6 +35,9 @@ jobs:
       - name: Install search indexer
         run: npm ci
 
+      - name: Generate category pages
+        run: ruby scripts/generate-category-pages.rb
+
       - name: Build Jekyll site
         uses: actions/jekyll-build-pages@v1
         with:

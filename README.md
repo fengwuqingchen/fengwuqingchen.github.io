@@ -94,6 +94,8 @@ categories: [tech, projects]
 
 新增分类时，先在 `_data/categories.yml` 中添加配置，再在文章中使用对应的 `slug`。博客的分类导航、分类页和文章标签会自动更新。
 
+分类名称和文章分类标签均可点击，进入 `/categories/<slug>/` 查看该分类下的全部普通文章（按日期倒序）。空分类会显示空状态；引用资料不进入分类列表。部署时自动根据 YAML 生成独立分类页，新增分类不需要手写页面。本地构建 Jekyll 前先运行 `ruby scripts/generate-category-pages.rb`，生成目录 `generated-categories/` 不提交到 Git。
+
 ## 修改博客信息
 
 - 博客名称、简介和作者：编辑 `_config.yml`

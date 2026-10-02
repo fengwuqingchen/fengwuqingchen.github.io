@@ -1,0 +1,30 @@
+---
+layout: default
+---
+{% assign category = site.data.categories | where: "slug", page.category_slug | first %}
+{% assign category_posts = site.posts | where_exp: "post", "post.categories contains page.category_slug" %}
+<section class="page shell category-shell">
+  <header class="post-header">
+    <a class="back-link" href="{{ '/categories/' | relative_url }}">cd ../categories</a>
+    <p class="eyebrow">category/{{ category.slug }}</p>
+    <h1>{{ category.name }}</h1>
+    <p class="category-intro">{{ category.description }}</p>
+    <p class="category-command">{{ category_posts | size }} 篇文章</p>
+  </header>
+  {% if category_posts.size > 0 %}
+    <ol class="post-list">
+      {% for post in category_posts %}
+        <li class="post-card">
+          <div class="post-card-main">
+            <p class="post-date">{{ post.date | date: '%Y.%m.%d' }}</p>
+            <h2><a class="post-title-link" href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+            {% if post.description %}<p class="post-description">{{ post.description }}</p>{% endif %}
+          </div>
+          <a class="post-arrow" href="{{ post.url | relative_url }}" aria-label="阅读《{{ post.title }}》">open →</a>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="empty-state">这个分类还没有文章。<a href="{{ '/categories/' | relative_url }}">查看其他分类 →</a></p>
+  {% endif %}
+</section>
