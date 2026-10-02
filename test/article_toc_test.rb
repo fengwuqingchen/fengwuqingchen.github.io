@@ -18,7 +18,7 @@ class ArticleTocTest < Minitest::Test
   def test_outline_script_builds_links_for_markdown_heading_levels
     script = read("assets/js/article-toc.js")
 
-    assert_includes script, ".prose h2, .prose h3, .prose h4"
+    assert_includes script, ".prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6"
     assert_includes script, "heading.id"
     assert_includes script, "heading-anchor"
     assert_includes script, "IntersectionObserver"

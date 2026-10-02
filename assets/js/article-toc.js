@@ -1,9 +1,10 @@
 (() => {
   const toc = document.querySelector("[data-article-toc]");
   const tocList = document.querySelector("[data-article-toc-list]");
-  const headings = [...document.querySelectorAll(".prose h2, .prose h3, .prose h4")];
+  const headings = [...document.querySelectorAll(".prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6")];
 
   if (!toc || !tocList || headings.length === 0) return;
+  const firstLevel = Math.min(...headings.map((heading) => Number(heading.tagName.slice(1))));
 
   const usedIds = new Set([...document.querySelectorAll("[id]")].map((element) => element.id));
   const linksById = new Map();
@@ -51,6 +52,7 @@
 
     const item = document.createElement("li");
     item.className = `toc-level-${heading.tagName.slice(1)}`;
+    item.style.setProperty("--toc-depth", Number(heading.tagName.slice(1)) - firstLevel);
 
     const link = document.createElement("a");
     link.href = `#${heading.id}`;
