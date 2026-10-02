@@ -42,6 +42,10 @@ class PostPublisher
     catalog = YAML.safe_load(File.read(File.join(@repo, "_data/categories.yml")))
     unknown = categories - catalog.map { |category| category.fetch("slug") }
     reference_only = !match || metadata["ai_generated"] == true || metadata["reference_only"] == true
+    if reference_only
+      raise "引用文章过大：#{@source}" if source_text.bytesize > @limits[1]
+      @note_sizes[@source] = source_text.bytesize
+    end
     raise "分类不能为空或未注册：#{unknown.join(', ')}" if (!reference_only && categories.empty?) || !unknown.empty?
     metadata["categories"] = categories
     metadata["tags"] = Array(metadata["tags"])

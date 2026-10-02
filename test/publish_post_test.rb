@@ -151,6 +151,7 @@ class PublishPostTest < Minitest::Test
 
   def test_front_matter_free_root_is_an_ai_reference_not_a_post
     File.write(@source, "# 自动生成\ntext")
+    assert_includes assert_raises(RuntimeError) { publisher(attachment_mb: 0.000001).plan }.message, "引用文章过大"
     importer = publisher
     result = importer.plan
     assert_equal "_references/test-post.md", result[:post]
