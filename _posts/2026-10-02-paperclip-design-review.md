@@ -94,7 +94,7 @@ Content-Type: application/json
 
 后续也可以通过其他的接口修改 agent 的配置。我看着这部分的接口还是挺多的
 - 配置 skill
-```
+```http
 POST /api/agents/:agentId/skills/sync
 ```
 
@@ -111,7 +111,7 @@ interface AgentSkillSyncRequest {
 }
 ```
 - 其他
-```
+```http
 GET    /api/agents/:id/instructions-bundle
 GET    /api/agents/:id/instructions-bundle/file?path=AGENTS.md
 GET    /api/agents/:id/instructions-bundle/history
@@ -156,7 +156,7 @@ DELETE /api/agents/:id/instructions-bundle/file
 然后它的主要配置字段是这样的
 >  因为大量的功能都依赖这样的字段，这些字段我就先原样的粘贴了
 
-```json
+```ts
 interface PersistedAgent {
   // 主键与归属
   id: string;                         // UUID
@@ -207,7 +207,7 @@ interface PersistedAgent {
 ```
 
 adapterConfig 的结构。这里面一些信息的传递还是挺有趣的，不过会在后面说。
-```json
+```ts
 interface PersistedAgentAdapterConfig {
   /*
    * Paperclip 跨 Adapter 公共字段
@@ -302,7 +302,7 @@ interface PersistedAgentAdapterConfig {
 ```
 
 这是 runtimeConfig 的结构
-```json
+```ts
 interface PersistedAgentRuntimeConfig {
   /*
    * 心跳和运行调度

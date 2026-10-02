@@ -680,7 +680,7 @@ a.category-tag:hover { border-color: var(--accent); background: var(--accent-sof
   overflow-x: auto;
   padding: 42px 20px 20px;
   border: 1px solid var(--line);
-  border-radius: 0;
+  border-radius: 9px;
   color: var(--code-fg);
   background: var(--code-bg);
   font-family: var(--mono);
@@ -693,14 +693,53 @@ a.category-tag:hover { border-color: var(--accent); background: var(--accent-sof
   top: 0;
   right: 0;
   left: 0;
-  height: 25px;
-  padding: 3px 9px;
-  content: "●  ●  ●";
+  height: 30px;
+  content: "";
   border-bottom: 1px solid #34403d;
-  color: #769088;
-  font-size: .55rem;
-  letter-spacing: .35em;
+  background: radial-gradient(circle at 18px 15px, #ff5f57 5px, transparent 5.5px), radial-gradient(circle at 35px 15px, #febc2e 5px, transparent 5.5px), radial-gradient(circle at 52px 15px, #28c840 5px, transparent 5.5px);
 }
+
+.code-window {
+  margin-block: 1.5em;
+  overflow: hidden;
+  border: 1px solid #34443f;
+  border-radius: 9px;
+  color: var(--code-fg);
+  background: var(--code-bg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .08);
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  height: 36px;
+  padding-inline: 14px;
+  border-bottom: 1px solid #34443f;
+  background: rgba(255, 255, 255, .025);
+}
+.code-window-dots { display: inline-flex; gap: 7px; }
+.code-window-dots i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12); }
+.code-window-dots i:nth-child(2) { background: #febc2e; }
+.code-window-dots i:nth-child(3) { background: #28c840; }
+.code-language { color: #aab9b3; font-family: var(--mono); font-size: .65rem; line-height: 1; }
+.code-window > .highlighter-rouge, .code-window .highlight { margin: 0; background: transparent; }
+.code-window pre { margin: 0; padding: 18px 20px 20px; border: 0; border-radius: 0; tab-size: 2; }
+.code-window pre::before { display: none; }
+.prose pre code { color: inherit; background: transparent; }
+
+/* Rouge's server-rendered tokens work without client-side language libraries. */
+.prose pre :is(.c, .c1, .cm, .cp, .cs, .ch) { color: #91a39a; font-style: italic; }
+.prose pre :is(.k, .kd, .kn, .kp, .kr, .kc, .kt, .ow) { color: #c6a7f2; }
+.prose pre :is(.s, .s1, .s2, .sb, .sc, .sd, .se, .sh, .si, .sr, .ss, .sx) { color: #a7d8a3; }
+.prose pre :is(.m, .mi, .mf, .mh, .mo, .il, .mb) { color: #edbe85; }
+.prose pre :is(.na, .nt, .nv, .vc, .vg, .vi) { color: #8ccde6; }
+.prose pre :is(.nf, .fm, .nc, .nn, .nb, .ne) { color: #eed28a; }
+.prose pre :is(.o, .p) { color: #b9c7c2; }
+.prose pre :is(.err, .gd) { color: #f39393; }
+.prose pre :is(.gh, .gu) { color: #8ccde6; font-weight: 600; }
+.prose pre .ge { font-style: italic; }
+.prose pre .gs { font-weight: 600; }
+.prose pre .gi { color: #a7d8a3; }
 
 .prose code { font-family: var(--mono); }
 .prose :not(pre) > code { padding: .13em .34em; color: var(--accent); background: var(--accent-soft); font-size: .88em; }
