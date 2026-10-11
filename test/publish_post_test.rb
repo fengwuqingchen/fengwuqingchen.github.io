@@ -42,7 +42,7 @@ class PublishPostTest < Minitest::Test
     importer.write
     article = File.read(File.join(@repo, plan[:post]))
     assert_includes article, "render_with_liquid: false"
-    assert_includes article, "[my image.png](/assets/posts/"
+    assert_match(%r{<img src="/assets/posts/[^"]+" alt="my image.png" width="400">}, article)
     assert_includes article, '[PDF](/assets/posts/'
     assert_includes article, ' "附件")'
     assert_includes article, "https://example.com"
@@ -64,6 +64,18 @@ class PublishPostTest < Minitest::Test
     assert_includes article, ".pdf#page=2)"
     assert_match(/\[pdf\]: \/assets\/posts\/.+\.pdf/, article)
     assert_match(/<img src="\/assets\/posts\/.+\.png">/, article)
+  end
+
+  def test_obsidian_image_dimensions_survive_upload_without_changing_unscaled_images
+    write_source("![[my image.png|712]]\n![[my image.png|300x200]]\n![[my image.png]]\n")
+    importer = publisher
+    result = importer.plan
+    importer.write
+    article = File.read(File.join(@repo, result[:post]))
+    assert_includes article, 'width="712"'
+    assert_includes article, 'width="300" height="200"'
+    assert_includes article, '![my image.png](/assets/posts/'
+    assert_equal 1, result[:resources].size
   end
 
   def test_oversized_images_fail_before_writing_anything

@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require "date"
+require "cgi"
 require "digest"
 require "fileutils"
 require "find"
@@ -164,6 +165,13 @@ class PostPublisher
       target = "#{path}.md#{fragment ? '#' + fragment : ''}" if extension.empty?
       url = local_url(target)
       image = embedded == "!" && IMAGE_EXTENSIONS.include?(extension)
+      dimensions = label&.match(/\A([1-9]\d*)(?:x([1-9]\d*))?\z/)
+      if image && dimensions
+        # HTML dimensions survive kramdown; CSS keeps images responsive.
+        attributes = "width=\"#{dimensions[1]}\""
+        attributes += " height=\"#{dimensions[2]}\"" if dimensions[2]
+        next "<img src=\"#{CGI.escapeHTML(url)}\" alt=\"#{CGI.escapeHTML(File.basename(path))}\" #{attributes}>"
+      end
       label = File.basename(path) if label.nil? || label.match?(/\A\d+(?:x\d+)?\z/)
       label = label.gsub(/[\[\]]/, "")
       "#{image ? '!' : ''}[#{label}](#{url})"
