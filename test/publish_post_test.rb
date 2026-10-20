@@ -106,8 +106,8 @@ class PublishPostTest < Minitest::Test
     write_source("text")
     File.write(@source, File.read(@source).sub("categories: tech", "categories: missing"))
     assert_raises(RuntimeError) { publisher.plan }
-    write_source("[网页](page.html)")
-    File.write(File.join(@source_dir, "page.html"), "<script>demo</script>")
+    write_source("[脚本](script.js)")
+    File.write(File.join(@source_dir, "script.js"), "demo")
     assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "不发布"
     write_source("text")
     importer = publisher
@@ -126,13 +126,13 @@ class PublishPostTest < Minitest::Test
     assert_equal 2, result[:references].size
     assert_equal 2, result[:resources].size
     importer.write
-    assert_equal 2, Dir.children(File.join(@repo, "_references")).size
+    assert_equal 2, Dir.children(File.join(@repo, "_ai_articles")).size
     root = File.read(File.join(@repo, result[:post]))
-    assert_equal 3, root.scan(%r{\(/references/}).size
+    assert_equal 3, root.scan(%r{\(/ai/posts/}).size
     result[:references].each do |note|
       content = File.read(File.join(@repo, note[:destination]))
       assert_includes content, "ai_generated: true"
-      assert_includes content, "reference_only: true"
+      assert_includes content, "reference_only: false"
       assert_includes content, "search_exclude: true"
       assert_includes content, "render_with_liquid: false"
     end
@@ -166,8 +166,8 @@ class PublishPostTest < Minitest::Test
     assert_includes assert_raises(RuntimeError) { publisher(attachment_mb: 0.000001).plan }.message, "引用文章过大"
     importer = publisher
     result = importer.plan
-    assert_equal "_references/test-post.md", result[:post]
-    assert_equal "/references/test-post/", result[:url]
+    assert_equal "_ai_articles/test-post.md", result[:post]
+    assert_equal "/ai/posts/test-post/", result[:url]
     importer.write
     assert_empty Dir.children(File.join(@repo, "_posts"))
     assert_includes File.read(File.join(@repo, result[:post])), "ai_generated: true"
@@ -203,6 +203,84 @@ class PublishPostTest < Minitest::Test
     second = publisher(slug: "another-post")
     assert_equal result[:references].first[:url], second.plan[:references].first[:url]
     second.write
-    assert_equal 1, Dir.children(File.join(@repo, "_references")).size
+    assert_equal 1, Dir.children(File.join(@repo, "_ai_articles")).size
+  end
+
+  def test_ai_category_and_legacy_field_produce_ai_documents_with_topic_categories
+    File.write(@source, "---\ntitle: AI 分析\ncategories: [ai, tech]\n---\nbody")
+    importer = publisher
+    result = importer.plan
+    assert_equal "ai", result[:kind]
+    importer.write
+    metadata = YAML.safe_load(File.read(File.join(@repo, result[:post])).split("---", 3)[1])
+    assert_equal ["tech"], metadata["categories"]
+    assert_equal true, metadata["ai_generated"]
+    assert_equal false, metadata["reference_only"]
+    assert_equal true, metadata["search_exclude"]
+    write_source("body")
+    assert_equal "post", publisher(slug: "ordinary").plan[:kind]
+  end
+
+  def test_same_ai_file_and_assets_have_same_url_from_standalone_and_reference_publishing
+    ai = File.join(@source_dir, "analysis.md")
+    File.write(ai, "---\ntitle: 分析\ncategories: [tech]\nai_generated: true\n---\n![[my image.png|300]]")
+    write_source("![[my image.png]]\n[[analysis]]")
+    importer = publisher
+    via_reference = importer.plan
+    importer.write
+    direct = PostPublisher.new(source: ai, repo: @repo)
+    via_direct = direct.plan
+    assert_equal via_reference[:references].first[:url], via_direct[:url]
+    direct.write
+    assert_equal 1, Dir.children(File.join(@repo, "_ai_articles")).size
+  end
+
+  def test_ai_slug_conflicts_and_conflicting_markers_fail_without_writes
+    File.write(@source, "---\ntitle: AI\ncategories: [ai, tech]\nai_generated: false\n---\ntext")
+    assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "冲突"
+    File.write(@source, "---\ntitle: AI\ncategories: [ai, tech]\nslug: shared\n---\nfirst")
+    first = PostPublisher.new(source: @source, repo: @repo)
+    first.plan
+    first.write
+    File.write(@source, File.read(@source).sub("first", "second"))
+    assert_includes assert_raises(RuntimeError) { PostPublisher.new(source: @source, repo: @repo).plan }.message, "冲突"
+  end
+
+  def test_html_is_compiled_to_data_and_unlisted_viewer_with_local_dependencies
+    write_source("[演示](demo.html)")
+    File.write(File.join(@source_dir, "demo.html"), '<html><head><link rel="stylesheet" href="style.css"></head><body><button id="b">click</button><img src="attachments/my%20image.png"><script src="demo.js"></script></body></html>')
+    File.write(File.join(@source_dir, "style.css"), 'body { color: red; }')
+    File.write(File.join(@source_dir, "demo.js"), 'document.querySelector("#b").onclick = () => { document.querySelector("#b").textContent = "clicked"; };')
+    importer = publisher
+    result = importer.plan
+    assert_equal 1, result[:html_documents].size
+    assert_empty result[:resources]
+    item = result[:html_documents].first
+    assert_equal 4, item[:dependencies].size
+    importer.write
+    payload = JSON.parse(File.read(File.join(@repo, item[:payload_destination])))
+    assert_equal 1, payload["version"]
+    assert_includes payload["html"], 'onclick'
+    assert_includes payload["html"], 'data:image/png;base64,'
+    refute_includes payload["html"], 'src="demo.js"'
+    page = File.read(File.join(@repo, item[:destination]))
+    assert_includes page, "search_exclude: true"
+    assert_includes page, "reference_only: true"
+    assert_includes File.read(File.join(@repo, result[:post])), item[:url]
+    refute File.exist?(File.join(@repo, "demo.html"))
+  end
+
+  def test_html_missing_remote_or_oversized_dependencies_fail_before_writing
+    write_source("[演示](demo.html)")
+    html = File.join(@source_dir, "demo.html")
+    File.write(html, '<script src="https://example.com/demo.js"></script>')
+    assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "外部资源"
+    File.write(html, '<img src="missing.png">')
+    assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "找不到 HTML 资源"
+    File.write(html, '<img src="attachments/my%20image.png">')
+    assert_includes assert_raises(RuntimeError) { publisher(image_mb: 0.000001).plan }.message, "HTML 资源过大"
+    File.write(html, '<button>click</button>')
+    assert_includes assert_raises(RuntimeError) { publisher(total_mb: 0.000001).plan }.message, "超限"
+    refute File.exist?(File.join(@repo, "_html_documents"))
   end
 end

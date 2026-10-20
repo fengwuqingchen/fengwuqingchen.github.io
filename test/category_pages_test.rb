@@ -20,6 +20,9 @@ class CategoryPagesTest < Minitest::Test
         assert_equal category["slug"], metadata["category_slug"]
         assert_equal "/categories/#{category['slug']}/", metadata["permalink"]
         assert_equal true, metadata["search_exclude"]
+        ai = YAML.safe_load(File.read(File.join(repo, "generated-categories", "ai-#{category.fetch('slug')}.html")).split("---", 3)[1])
+        assert_equal "ai-list", ai["layout"]
+        assert_equal "/ai/categories/#{category['slug']}/", ai["permalink"]
       end
     end
   end

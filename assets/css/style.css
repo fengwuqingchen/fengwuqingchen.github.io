@@ -788,6 +788,14 @@ a.category-tag:hover { border-color: var(--accent); background: var(--accent-sof
 .category-posts time { color: var(--muted); font-family: var(--mono); font-size: .69rem; }
 .category-posts a { font-size: .88rem; font-weight: 600; text-underline-offset: 4px; }
 .category-empty { margin: 18px 0 0; color: var(--muted); font-family: var(--mono); font-size: .7rem; }
+.ai-category-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; font-family: var(--mono); font-size: .8rem; }
+.ai-category-nav a { padding: 7px 12px; border: 1px solid var(--line); text-decoration: none; }
+.ai-category-nav a:hover, .ai-category-nav a[aria-current="page"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+.ai-category-nav span { color: var(--muted); }
+.html-viewer { max-width: 1200px; }
+.html-viewer h1 { overflow-wrap: anywhere; }
+.html-viewer-controls { display: flex; flex-wrap: wrap; gap: 24px; margin-bottom: 20px; }
+.html-viewer iframe { display: block; width: 100%; height: 75vh; min-height: 400px; border: 1px solid var(--line); background: white; }
 
 .site-footer {
   padding-block: 28px;

@@ -1,9 +1,11 @@
 {% if include.categories and include.categories != empty %}
   <div class="category-tags" aria-label="文章分类">
+    {% assign category_base = '/categories/' %}
+    {% if page.ai_generated or include.ai %}{% assign category_base = '/ai/categories/' %}{% endif %}
     {% for category_slug in include.categories %}
       {% assign category = site.data.categories | where: "slug", category_slug | first %}
       {% if category %}
-        <a class="category-tag" href="{{ '/categories/' | append: category.slug | append: '/' | relative_url }}">{{ category.name }}</a>
+        <a class="category-tag" href="{{ category_base | append: category.slug | append: '/' | relative_url }}">{{ category.name }}</a>
       {% else %}
         <span class="category-tag category-tag-unknown">{{ category_slug }}</span>
       {% endif %}

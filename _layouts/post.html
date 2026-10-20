@@ -4,6 +4,8 @@ layout: default
 {% assign article_plaintext = content | strip_html | strip_newlines | replace: " ", "" | replace: "　", "" %}
 {% assign article_character_count = article_plaintext | size %}
 {% assign article_reading_minutes = article_character_count | plus: 399 | divided_by: 400 %}
+{% assign article_list_url = '/' %}
+{% if page.ai_generated %}{% assign article_list_url = '/ai/' %}{% endif %}
 <div class="article-layout">
   <aside class="article-toc" data-article-toc hidden aria-label="文章目录" data-pagefind-ignore="all">
     <p class="article-toc-label">目录 / ON THIS PAGE</p>
@@ -12,10 +14,12 @@ layout: default
 
   <article class="post reading-shell" data-pagefind-body>
     <header class="post-header">
-      <a class="back-link" href="{{ '/' | relative_url }}">cd ../posts</a>
-      <p class="article-path">{% if page.reference_only %}~/references/{{ page.title }}.md{% else %}~/posts/{{ page.slug }}.md{% endif %}</p>
-      <h1 data-pagefind-meta="title">{{ page.title }}</h1>
-      {% if page.reference_only %}
+      <a class="back-link" href="{{ article_list_url | relative_url }}">{% if page.ai_generated %}cd ../ai{% else %}cd ../posts{% endif %}</a>
+      <p class="article-path">{% if page.ai_generated %}~/ai/{{ page.title }}.md{% elsif page.reference_only %}~/references/{{ page.title }}.md{% else %}~/posts/{{ page.slug }}.md{% endif %}</p>
+      <h1 data-pagefind-meta="title">{{ page.title | escape }}</h1>
+      {% if page.ai_generated %}
+        <p class="reference-notice"><a href="{{ '/ai/' | relative_url }}">AI 文</a> · AI 生成的引用资料，请核实其中的信息。</p>
+      {% elsif page.reference_only %}
         <p class="reference-notice">{% if page.ai_generated %}AI 生成的引用资料{% else %}引用资料{% endif %} · 仅供辅助阅读，请核实其中的信息。</p>
       {% endif %}
       <div class="post-meta">
@@ -49,7 +53,7 @@ layout: default
     </div>
     <footer class="post-end" data-pagefind-ignore="all">
       <span>EOF</span>
-      <a href="{{ '/' | relative_url }}">返回文章列表 ↑</a>
+      <a href="{{ article_list_url | relative_url }}">{% if page.ai_generated %}返回 AI 文列表 ↑{% else %}返回文章列表 ↑{% endif %}</a>
     </footer>
   </article>
 </div>

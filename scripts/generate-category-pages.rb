@@ -16,6 +16,9 @@ def generate_category_pages(repo)
                  "category_slug" => category.fetch("slug"), "search_exclude" => true,
                  "permalink" => "/categories/#{category.fetch('slug')}/" }
     File.write(File.join(destination, "#{category.fetch('slug')}.html"), "#{YAML.dump(metadata)}---\n")
+    ai_metadata = metadata.merge("layout" => "ai-list", "title" => "AI 文 · #{category.fetch('name')}",
+                                 "permalink" => "/ai/categories/#{category.fetch('slug')}/")
+    File.write(File.join(destination, "ai-#{category.fetch('slug')}.html"), "#{YAML.dump(ai_metadata)}---\n")
   end
 end
 

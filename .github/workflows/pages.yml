@@ -35,6 +35,21 @@ jobs:
       - name: Install search indexer
         run: npm ci
 
+      - name: Test publisher and prepare isolated fixture
+        run: |
+          gem install --user-install nokogiri --no-document
+          ruby -Itest -e 'Dir["test/*_test.rb"].sort.each { |file| require File.expand_path(file) }'
+          ruby test/prepare_site_fixture.rb _site-fixture
+
+      - name: Build isolated integration fixture
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./_site-fixture/source
+          destination: ./_site-fixture/site
+
+      - name: Verify isolated integration fixture
+        run: ruby test/verify_site_fixture.rb _site-fixture
+
       - name: Generate category pages
         run: ruby scripts/generate-category-pages.rb
 

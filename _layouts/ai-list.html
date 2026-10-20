@@ -1,0 +1,38 @@
+---
+layout: default
+---
+{% assign ai_posts = site.ai_articles | sort: 'date' | reverse %}
+{% assign selected_category = site.data.categories | where: 'slug', page.category_slug | first %}
+{% if page.category_slug %}{% assign ai_posts = ai_posts | where_exp: 'post', 'post.categories contains page.category_slug' %}{% endif %}
+<section class="page shell category-shell">
+  <header class="post-header">
+    <p class="eyebrow">AI / FIELD NOTES</p>
+    <h1>{% if selected_category %}AI 文 · {{ selected_category.name }}{% else %}AI 文{% endif %}</h1>
+    <p class="category-intro">单独收录 AI 生成的资料与分析。内容仅供参考，请结合来源核实。</p>
+    <p class="category-command">{{ ai_posts | size }} 篇文章</p>
+    <nav class="ai-category-nav" aria-label="AI 文章分类">
+      <a href="{{ '/ai/' | relative_url }}"{% unless page.category_slug %} aria-current="page"{% endunless %}>全部</a>
+      {% for category in site.data.categories %}
+        {% assign category_posts = site.ai_articles | where_exp: 'post', 'post.categories contains category.slug' %}
+        <a href="{{ '/ai/categories/' | append: category.slug | append: '/' | relative_url }}"{% if page.category_slug == category.slug %} aria-current="page"{% endif %}>{{ category.name }} <span>{{ category_posts | size }}</span></a>
+      {% endfor %}
+    </nav>
+  </header>
+  {% if ai_posts.size > 0 %}
+    <ol class="post-list">
+      {% for post in ai_posts %}
+        <li class="post-card">
+          <div class="post-card-main">
+            <p class="post-date">AI :: {{ post.date | date: '%Y.%m.%d' }}</p>
+            <h2><a class="post-title-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h2>
+            {% if post.description %}<p class="post-description">{{ post.description | escape }}</p>{% endif %}
+            {% include category-labels.html categories=post.categories ai=true %}
+          </div>
+          <a class="post-arrow" href="{{ post.url | relative_url }}" aria-label="阅读《{{ post.title | escape }}》">open →</a>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="empty-state">{% if page.category_slug %}这个分类还没有 AI 文章。{% else %}还没有发布 AI 文章，之后的资料会收录在这里。{% endif %}</p>
+  {% endif %}
+</section>

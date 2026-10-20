@@ -1,0 +1,19 @@
+---
+layout: default
+---
+<section class="page shell html-viewer" data-pagefind-ignore="all">
+  <header class="post-header">
+    <a class="back-link" href="{{ '/' | relative_url }}" data-html-back>返回文章</a>
+    <p class="eyebrow">HTML / ISOLATED VIEW</p>
+    <h1>{{ page.title | escape }}</h1>
+    <p class="reference-notice">交互在隔离区域中运行，不授予博客同源权限。外部资源与网络接口受限；弹窗、表单提交和自动下载默认关闭。请勿输入敏感信息。</p>
+  </header>
+  <p role="status" data-html-status>点击加载交互内容后运行附件中的 JavaScript。</p>
+  <div class="html-viewer-controls">
+    <button class="text-link" type="button" data-html-load>加载交互内容 →</button>
+    <button class="text-link" type="button" data-html-stop hidden>停止运行</button>
+  </div>
+  <div data-html-container data-html-payload="{{ page.html_payload | relative_url | escape }}"></div>
+  <noscript>请启用 JavaScript 查看这份 HTML 资料。</noscript>
+</section>
+<script src="{{ '/assets/js/html-viewer.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>

@@ -10,6 +10,12 @@ future: false
 
 # Reference documents are deliberately not posts: no home/archive/feed entries.
 collections:
+  ai_articles:
+    output: true
+    permalink: /ai/posts/:name/
+  html_documents:
+    output: true
+    permalink: /html/:name/
   references:
     output: true
     permalink: /references/:name/
@@ -28,6 +34,20 @@ feed:
   path: feed.xml
 
 defaults:
+  - scope:
+      path: ""
+      type: ai_articles
+    values:
+      layout: post
+      ai_generated: true
+      search_exclude: true
+  - scope:
+      path: ""
+      type: html_documents
+    values:
+      layout: html-reference
+      reference_only: true
+      search_exclude: true
   - scope:
       path: ""
       type: references
