@@ -66,7 +66,7 @@ slug: architecture-analysis
 
 ### 图片无损优化与资源限制
 
-默认对静态 PNG 尝试无损 WebP 编码：不改变像素尺寸、透明度或进行有损量化，并保留可用元数据。只接受比原文件小的结果；动图、JPEG、SVG 等保持原样，避免丢失动画、方向或重复有损压缩。原文件不会改动。工具缺失、失败、超时或压缩无收益时保留原图，`--dry-run` 的 `compression`、`original_size`、`size` 显示实际处理结果；可用 `--no-compress-images` 关闭优化。
+默认对静态 PNG 尝试无损 WebP 编码：不改变像素尺寸、透明度或进行有损量化，并保留可用元数据。只接受比原文件小的结果；16 位 PNG、动图、JPEG、SVG 等保持原样，避免降位深、丢失动画、方向或重复有损压缩。原文件不会改动。工具缺失、失败、超时或压缩无收益时保留原图，`--dry-run` 的 `compression`、`original_size`、`size` 显示实际处理结果；可用 `--no-compress-images` 关闭优化。
 
 默认源单图上限 10 MiB、单个其它附件 20 MiB、整次发布输出资源合计 100 MiB，可用 `--image-mb`、`--attachment-mb`、`--total-mb` 调整。先检查源文件大小，避免大文件绕过校验；总量按优化后的普通资源、引用文档以及 HTML 数据包大小计算。HTML 各源依赖还受各自及包内总量限制。新资源按内容哈希存放在 `/assets/posts/media/`，同轮去重；旧文章与旧资源 URL 不会自动改写。
 

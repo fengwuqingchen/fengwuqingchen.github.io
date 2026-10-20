@@ -11,6 +11,8 @@ module ImageOptimizer
     return result.merge(compression: "disabled") unless enabled
     # Avoid destroying animation, orientation, HDR, or vector information.
     return result unless result[:extension] == ".png" && original.start_with?("\x89PNG\r\n\x1a\n".b)
+    # WebP is 8-bit; never call a 16-bit PNG down-conversion "lossless".
+    return result if original.getbyte(24) == 16
     return result if animated_png?(original)
     Tempfile.create(["blog-image-", ".webp"]) do |output|
       begin

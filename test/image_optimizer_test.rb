@@ -40,6 +40,10 @@ class ImageOptimizerTest < Minitest::Test
       path = File.join(dir, "animated.png")
       File.binwrite(path, image[0, 33] + animation + image[33..])
       assert_equal "original", ImageOptimizer.optimize(path)[:compression]
+      high_precision = png
+      high_precision.setbyte(24, 16)
+      File.binwrite(path, high_precision)
+      assert_equal high_precision, ImageOptimizer.optimize(path)[:bytes]
       File.binwrite(path, "invalid")
       assert_equal "invalid", ImageOptimizer.optimize(path)[:bytes]
     end
