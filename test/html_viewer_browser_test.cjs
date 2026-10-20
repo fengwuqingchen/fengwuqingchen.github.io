@@ -53,7 +53,7 @@ const { chromium } = require('playwright');
     assert.equal(await page.locator('body').getAttribute('data-compromised'), null);
     assert.equal(page.url(), base + '/');
     assert(!requests.includes('/exfiltrate'));
-    await page.screenshot({ path: '/private/tmp/blog-html-sandbox-test.png', fullPage: true });
+    await page.screenshot({ path: path.join(os.tmpdir(), 'blog-html-sandbox-test.png'), fullPage: true });
     await page.locator('[data-html-stop]').click();
     assert.equal(await page.locator('iframe').count(), 0, 'stop destroys the execution context');
     console.log('PASS: local interaction; parent/storage/network/navigation/popups blocked; stop destroys iframe');
