@@ -246,6 +246,15 @@ class PublishPostTest < Minitest::Test
     assert_includes assert_raises(RuntimeError) { PostPublisher.new(source: @source, repo: @repo).plan }.message, "冲突"
   end
 
+  def test_same_batch_ai_slug_conflicts_fail_before_writing
+    write_source("[[first]]\n[[second]]")
+    %w[first second].each do |name|
+      File.write(File.join(@source_dir, "#{name}.md"), "---\ntitle: #{name}\ncategories: [ai, tech]\nslug: conflict\n---\n#{name}")
+    end
+    assert_includes assert_raises(RuntimeError) { publisher.plan }.message, "slug 冲突"
+    refute File.exist?(File.join(@repo, "_ai_articles"))
+  end
+
   def test_html_is_compiled_to_data_and_unlisted_viewer_with_local_dependencies
     write_source("[演示](demo.html)")
     File.write(File.join(@source_dir, "demo.html"), '<html><head><link rel="stylesheet" href="style.css"></head><body><button id="b">click</button><img src="attachments/my%20image.png"><script src="demo.js"></script></body></html>')

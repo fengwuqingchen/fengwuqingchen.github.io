@@ -159,6 +159,9 @@ class PostPublisher
       raise "引用文章目标冲突：#{destination}；请直接编辑仓库文件或使用新 slug" unless existing_metadata == metadata && existing_body == body
     end
     note = { source: path, destination: destination, url: url, kind: ai ? "ai" : "reference", content: content }
+    if @references.key?(destination) && @references.fetch(destination)[:content] != content
+      raise "同一轮发布的引用文章 slug 冲突：#{destination}"
+    end
     @references[destination] = note
     note
   end
@@ -191,6 +194,7 @@ class PostPublisher
     bundle = HtmlBundle.new(limit: @limits[1], total_limit: @limits[2], image_limit: @limits[0], compress_images: @compress_images)
     html = bundle.compile(path)
     payload = JSON.generate({ version: 1, html: html })
+    raise "HTML 数据包过大：#{path}（#{format_size(payload.bytesize)} > #{format_size(@limits[1])}）" if payload.bytesize > @limits[1]
     digest = Digest::SHA256.hexdigest(payload)
     url = "/html/#{digest}/"
     payload_destination = "assets/html-data/#{digest}.json"

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "json"
+require "nokogiri"
 
 root = File.expand_path(ARGV.fetch(0))
 manifest = JSON.parse(File.read(File.join(root, "manifest.json")))
@@ -13,9 +14,15 @@ home = read_page.call("/")
 category = read_page.call("/categories/tech/")
 feed = File.read(File.join(site, "feed.xml"))
 raise "普通文章未出现在首页／分类" unless home.include?(ordinary) && category.include?(ordinary)
-[home, category, feed].each do |content|
+[home, category].each do |content|
   raise "AI 或 HTML 泄漏到普通入口" if content.include?(ai) || content.include?(html)
 end
+# Ordinary feed entries legitimately contain links to referenced AI/HTML in
+# their article body. Only AI/HTML becoming independent entries is forbidden.
+feed_document = Nokogiri::XML(feed) { |config| config.nonet }
+entry_urls = feed_document.xpath('//atom:entry/atom:id | //atom:entry/atom:link/@href', 'atom' => 'http://www.w3.org/2005/Atom').map(&:text)
+raise "普通文章未出现在订阅条目" unless entry_urls.any? { |url| url.end_with?(ordinary) }
+raise "AI 或 HTML 被列为独立订阅条目" if entry_urls.any? { |url| url.end_with?(ai) || url.end_with?(html) }
 raise "AI 首页缺少文章" unless read_page.call("/ai/").include?(ai)
 raise "AI 主题分类缺少文章" unless read_page.call("/ai/categories/tech/").include?(ai)
 ai_page = read_page.call(ai)
