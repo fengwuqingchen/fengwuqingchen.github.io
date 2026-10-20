@@ -2,8 +2,11 @@
 layout: default
 ---
 {% assign ai_posts = site.ai_articles | sort: 'date' | reverse %}
-{% assign selected_category = site.data.categories | where: 'slug', page.category_slug | first %}
-{% if page.category_slug %}{% assign ai_posts = ai_posts | where_exp: 'post', 'post.categories contains page.category_slug' %}{% endif %}
+{% assign selected_category = false %}
+{% if page.category_slug %}
+  {% assign selected_category = site.data.categories | where: 'slug', page.category_slug | first %}
+  {% assign ai_posts = ai_posts | where_exp: 'post', 'post.categories contains page.category_slug' %}
+{% endif %}
 <section class="page shell category-shell">
   <header class="post-header">
     <p class="eyebrow">AI / FIELD NOTES</p>

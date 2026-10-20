@@ -27,6 +27,7 @@ entry_urls = feed_document.xpath('//atom:entry/atom:id | //atom:entry/atom:link/
 raise "普通文章未出现在订阅条目" unless entry_urls.any? { |url| url.match?(%r{\Ahttps?://[^/]+/posts/}) }
 raise "AI 或 HTML 被列为独立订阅条目" if entry_urls.any? { |url| url.end_with?(ai) || url.end_with?(html) }
 raise "AI 首页缺少文章" unless read_page.call("/ai/").include?(ai)
+raise "AI 首页错误选中了主题" unless Nokogiri::HTML(read_page.call("/ai/")).at_css("h1").text.strip == "AI 文"
 raise "AI 主题分类缺少文章" unless read_page.call("/ai/categories/tech/").include?(ai)
 ai_page = read_page.call(ai)
 raise "AI 主题标签链接错误" unless ai_page.include?('/ai/categories/tech/')
