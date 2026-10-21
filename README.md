@@ -122,6 +122,8 @@ categories: [tech, projects]
 
 分类名称和文章分类标签均可点击，进入 `/categories/<slug>/` 查看该分类下的全部普通文章（按日期倒序）。空分类会显示空状态；引用资料不进入分类列表。部署时自动根据 YAML 生成独立分类页，新增分类不需要手写页面。本地构建 Jekyll 前先运行 `ruby scripts/generate-category-pages.rb`，生成目录 `generated-categories/` 不提交到 Git。
 
+分类概览每类最多预览最新 3 篇，数量标记仍是该类总数。超过 3 篇时显示可点击的 `...`，进入对应分类的完整列表；卡片路径文字与实际 `/categories/<slug>/` 地址一致。
+
 ## 修改博客信息
 
 - 博客名称、简介和作者：编辑 `_config.yml`

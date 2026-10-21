@@ -305,6 +305,7 @@ kbd {
 
 .intro-inner {
   position: relative;
+  max-width: 1000px;
   padding-block: 94px 82px;
 }
 
@@ -398,7 +399,6 @@ kbd {
 }
 
 .section-heading .terminal-line { margin-bottom: 5px; }
-.section-heading .terminal-line::after { display: none; }
 
 .section-heading h2 {
   margin: 0;
@@ -462,7 +462,7 @@ kbd {
 .post-title-link:focus-visible::after { outline: 2px solid var(--accent); outline-offset: 4px; }
 .post-card .category-tag,
 .post-card .post-arrow { position: relative; z-index: 2; }
-.post-title-link:hover { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 6px; }
+.post-title-link:hover { text-decoration: none; }
 .post-description { max-width: 680px; margin: 8px 0 0; color: var(--muted); font-family: var(--display); font-size: .94rem; }
 
 .post-arrow {
@@ -472,7 +472,7 @@ kbd {
   text-decoration: none;
 }
 
-.post-arrow:hover { text-decoration: underline; text-underline-offset: 5px; }
+.post-arrow:hover { text-decoration: none; }
 
 .reading-shell {
   width: min(760px, calc(100% - 48px));
@@ -788,6 +788,8 @@ a.category-tag:hover { border-color: var(--accent); background: var(--accent-sof
 .category-posts time { color: var(--muted); font-family: var(--mono); font-size: .69rem; }
 .category-posts a { font-size: .88rem; font-weight: 600; text-underline-offset: 4px; }
 .category-empty { margin: 18px 0 0; color: var(--muted); font-family: var(--mono); font-size: .7rem; }
+.category-more { display: inline-block; margin-top: 8px; padding: 4px 10px; color: var(--accent); font-family: var(--mono); font-size: 1rem; letter-spacing: .16em; text-decoration: none; }
+.category-more:hover { background: var(--accent-soft); }
 .ai-category-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; font-family: var(--mono); font-size: .8rem; }
 .ai-category-nav a { padding: 7px 12px; border: 1px solid var(--line); text-decoration: none; }
 .ai-category-nav a:hover, .ai-category-nav a[aria-current="page"] { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }

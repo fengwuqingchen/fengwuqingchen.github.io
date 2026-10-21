@@ -6,7 +6,7 @@ layout: default
 <section class="page shell category-shell">
   <header class="post-header">
     <a class="back-link" href="{{ '/categories/' | relative_url }}">cd ../categories</a>
-    <p class="eyebrow">category/{{ category.slug }}</p>
+    <p class="eyebrow">{{ page.url | relative_url }}</p>
     <h1>{{ category.name }}</h1>
     <p class="category-intro">{{ category.description }}</p>
     <p class="category-command">{{ category_posts | size }} 篇文章</p>

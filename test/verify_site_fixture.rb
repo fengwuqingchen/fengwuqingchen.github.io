@@ -12,6 +12,20 @@ ai = manifest.fetch("ai_url")
 html = manifest.fetch("html_url")
 home = read_page.call("/")
 category = read_page.call("/categories/tech/")
+overview = Nokogiri::HTML(read_page.call("/categories/"))
+overview.css('.category-group').each do |group|
+  count = group.at_css('.category-group-header > span').text.to_i
+  expected_preview = [count, 3].min
+  raise "分类预览数量错误" unless group.css('.category-posts li').size == expected_preview
+  link = group.at_css('.category-title-link')['href']
+  raise "分类路径文字与链接不一致" unless group.at_css('.category-command').text.strip == link
+  more = group.at_css('.category-more')
+  raise "分类省略入口错误" unless (count > 3 ? more && more['href'] == link && more.text == '...' : more.nil?)
+end
+home_document = Nokogiri::HTML(home)
+commands = home_document.css('.terminal-line').map(&:text).map(&:strip)
+raise "终端命令格式不统一" unless commands.size == 2 && commands.all? { |command| command.start_with?('fengqing@github:~$ ') }
+raise "分类详情路径文字错误" unless Nokogiri::HTML(category).at_css('.eyebrow').text.strip == '/categories/tech/'
 feed = File.read(File.join(site, "feed.xml"))
 raise "普通文章未出现在首页／分类" unless home.include?(ordinary) && category.include?(ordinary)
 [home, category].each do |content|
